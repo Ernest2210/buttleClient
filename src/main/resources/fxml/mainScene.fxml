@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<AnchorPane xmlns="http://javafx.com/javafx"
+            fx:id="ap"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.client.controller.MainSceneController"
+            maxHeight="400.0" maxWidth="600.0">
+    <StackPane>
+        <ImageView>
+            <Image requestedWidth="800" requestedHeight="600" url="/assets/main_background.jpg"/>
+        </ImageView>
+        <VBox alignment="CENTER" maxWidth="200" maxHeight="200" spacing="50">
+            <Button onAction="#createRoom">
+                Создать комнату
+                <stylesheets>
+                    <String fx:value="/fxml/mainStyle.css"/>
+                </stylesheets>
+            </Button>
+            <VBox alignment="CENTER" spacing="10">
+                <TextField fx:id="textField"></TextField>
+                <Button onAction="#connectToRoom">
+                    Присоединиться к комнате
+                    <stylesheets>
+                        <String fx:value="/fxml/mainStyle.css"/>
+                    </stylesheets>
+                </Button>
+            </VBox>
+        </VBox>
+    </StackPane>
+</AnchorPane>
