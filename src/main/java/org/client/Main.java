@@ -25,7 +25,7 @@ public class Main extends Application {
         time = 0;
 
         FXMLLoader loader = new FXMLLoader();
-        URL xmlUrl = getClass().getResource("/fxml/mainScene.fxml");
+        URL xmlUrl = getClass().getResource("/fxml/gameScene.fxml");
         loader.setLocation(xmlUrl);
         Parent root = loader.load();
         Scene scene = new Scene(root);
