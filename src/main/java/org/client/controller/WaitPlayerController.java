@@ -7,8 +7,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import org.client.Main;
+import org.client.Player;
 import org.client.enums.MessageType;
 import org.client.connection.ServerConnection;
+import org.client.enums.PlayerType;
 
 import java.io.IOException;
 import java.net.URL;
@@ -42,7 +45,15 @@ public class WaitPlayerController {
             throw new RuntimeException(e);
         }
         GameSceneController gameSceneController = loader.getController();
+        gameSceneController.setPlayerType(PlayerType.yellow);
         Scene scene = new Scene(root);
         stage.setScene(scene);
+
+        scene.setOnKeyPressed(event -> {
+            String keyInput = event.getCode().toString();
+            if (!Main.getInput().contains(keyInput)){
+                Main.getInput().add(keyInput);
+            }
+        });
     }
 }

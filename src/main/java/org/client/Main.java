@@ -7,10 +7,13 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.client.connection.ServerConnection;
+import org.client.controller.GameSceneController;
 
 import java.net.URL;
+import java.util.ArrayList;
 
 public class Main extends Application {
+    private static ArrayList<String> input;
     private long lastUpdate;
     private static int time;
     private static int updateRate = 120;
@@ -23,13 +26,16 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         lastUpdate = 0L;
         time = 0;
-
+        input = new ArrayList<>();
         FXMLLoader loader = new FXMLLoader();
-        URL xmlUrl = getClass().getResource("/fxml/gameScene.fxml");
+        URL xmlUrl = getClass().getResource("/fxml/mainScene.fxml");
         loader.setLocation(xmlUrl);
         Parent root = loader.load();
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
+
+
+
         this.serverConnection = ServerConnection.getServerConnection();
 
         new AnimationTimer() {
@@ -46,5 +52,13 @@ public class Main extends Application {
         }.start();
 
         primaryStage.show();
+    }
+
+    public static ArrayList<String> getInput(){
+        return input;
+    }
+
+    public static void clearInput(){
+        input.clear();
     }
 }

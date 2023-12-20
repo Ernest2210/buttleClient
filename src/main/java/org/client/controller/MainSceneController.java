@@ -8,8 +8,10 @@ import javafx.scene.Scene;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.scene.layout.AnchorPane;
+import org.client.Main;
 import org.client.enums.MessageType;
 import org.client.connection.ServerConnection;
+import org.client.enums.PlayerType;
 
 import java.io.IOException;
 import java.net.URL;
@@ -68,7 +70,15 @@ public class MainSceneController {
             throw new RuntimeException(e);
         }
         GameSceneController gameSceneController = loader.getController();
+        gameSceneController.setPlayerType(PlayerType.gray);
         Scene scene = new Scene(root);
         stage.setScene(scene);
+
+        scene.setOnKeyPressed(event -> {
+            String keyInput = event.getCode().toString();
+            if (!Main.getInput().contains(keyInput)){
+                Main.getInput().add(keyInput);
+            }
+        });
     }
 }

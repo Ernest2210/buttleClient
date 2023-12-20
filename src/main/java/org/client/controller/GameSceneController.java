@@ -1,24 +1,37 @@
 package org.client.controller;
 
 import javafx.fxml.FXML;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.image.Image;
+import org.client.Player;
+import org.client.connection.ServerConnection;
 import org.client.enums.FieldType;
+import org.client.enums.MessageType;
+import org.client.enums.PlayerType;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class GameSceneController {
+    public static final int FIELD_SIZE_X = 10;
+    public static final int FIELD_SIZE_Y = 10;
+    public static final double BLOCK_SIZE = 60;
     @FXML
     private AnchorPane ap;
-    private List<List<FieldType>> map;
+    private static List<List<FieldType>> map;
 
-    private List<List<FieldType>> getMap(){
+    private Player player;
+    private Player enemy;
+    private PlayerType playerType;
+
+    private static List<List<FieldType>> generateMap(){
         List<List<FieldType>> map = new ArrayList<>(10);
 
         List<FieldType> list1 = new ArrayList<>(10);
@@ -154,7 +167,7 @@ public class GameSceneController {
     }
 
     public void initialize(){
-        this.map = getMap();
+        this.map = generateMap();
         for (int i = 0; i < 10; i++){
             for (int j = 0; j < 10; j++) {
                 Rectangle rectangle = new Rectangle();
@@ -173,5 +186,40 @@ public class GameSceneController {
                 ap.getChildren().add(rectangle);
             }
         }
+    }
+
+    public PlayerType getPlayerType() {
+        return playerType;
+    }
+
+    public void setPlayerType(PlayerType playerType) {
+        this.playerType = playerType;
+        player = new Player(true, playerType);
+        if(playerType == PlayerType.yellow){
+            enemy = new Player(false, PlayerType.gray);
+        }else{
+            enemy = new Player(false, PlayerType.yellow);
+        }
+        ap.getChildren().add(player);
+        ap.getChildren().add(enemy);
+        ServerConnection serverConnection = ServerConnection.getServerConnection();
+        serverConnection.addCallback(MessageType.makeMove, this::moveEnemy);
+    }
+
+    public static List<List<FieldType>> getMap(){
+        return map;
+    }
+
+    public static FieldType getBlockFromMap(double x, double y){
+        int xIndex = (int)(y / BLOCK_SIZE);
+        int yIndex = (int)(x / BLOCK_SIZE);
+        if(xIndex < 0 || yIndex < 0 || xIndex > FIELD_SIZE_X - 1 || yIndex > FIELD_SIZE_Y - 1){
+            return FieldType.wall;
+        }
+        return map.get(xIndex).get(yIndex);
+    }
+
+    public void moveEnemy(Map<String, String> data){
+        enemy.moveOnCoords(Double.parseDouble(data.get("x_coord")), Double.parseDouble(data.get("y_coord")), data.get("direction"));
     }
 }
