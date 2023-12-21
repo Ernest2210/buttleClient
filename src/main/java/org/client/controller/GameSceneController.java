@@ -238,7 +238,7 @@ public class GameSceneController {
     public void enemyShot(Map<String, String> data){
         enemy.shot(Double.parseDouble(data.get("x_coord")),
                 Double.parseDouble(data.get("y_coord")),
-                data.get("direction"));
+                data.get("direction"), false);
     }
 
     public void gameOver(Map<String, String> data){

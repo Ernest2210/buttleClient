@@ -1,12 +1,15 @@
 package org.client;
 
 import javafx.animation.AnimationTimer;
+import javafx.animation.RotateTransition;
+import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
+import javafx.util.Duration;
 import org.client.connection.ServerConnection;
 import org.client.controller.GameSceneController;
 import org.client.enums.FieldType;
@@ -71,7 +74,7 @@ public class Player extends Rectangle {
                             ServerConnection serverConnection = ServerConnection.getServerConnection();
                             serverConnection.sendMove(data);
                         } else if (key.equals("SPACE")) {
-                            shot(getX() , getY() , direction);
+                            shot(getX() , getY() , direction, true);
                             Map<String, String> requestData = new HashMap<>();
                             requestData.put("x_coord", String.valueOf(getX()));
                             requestData.put("y_coord", String.valueOf(getY()));
@@ -103,11 +106,26 @@ public class Player extends Rectangle {
         });
     }
 
-    public void shot(double x, double y, String direction){
+    public void shot(double x, double y, String direction, boolean reloadAnimation){
         if(lastSootTime + RELOAD_TIME_MILLIS < System.currentTimeMillis()){
             Bullet bullet = new Bullet(x ,y , direction, ap, enemy);
             ap.getChildren().add(bullet);
             lastSootTime = System.currentTimeMillis();
+            if(reloadAnimation){
+                Rectangle reloadBullet = new Rectangle();
+                reloadBullet.setFill(new ImagePattern(new Image("/assets/BulletRIGHT.png")));
+                reloadBullet.setWidth(40);
+                reloadBullet.setHeight(30);
+                reloadBullet.setX(550);
+                reloadBullet.setY(0);
+                ap.getChildren().add(reloadBullet);
+                RotateTransition bulletRotate = new RotateTransition();
+                bulletRotate.setNode(reloadBullet);
+                bulletRotate.setDuration(Duration.millis(RELOAD_TIME_MILLIS));
+                bulletRotate.setByAngle(360);
+                bulletRotate.play();
+                bulletRotate.setOnFinished(event -> ap.getChildren().remove(reloadBullet));
+            }
         }
     }
 
