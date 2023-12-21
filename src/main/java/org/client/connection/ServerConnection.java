@@ -129,4 +129,16 @@ public class ServerConnection extends Thread{
             throw new RuntimeException(e);
         }
     }
+
+    public void sendGameOver(Map<String, String> data){
+        try {
+            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(this.socket.getOutputStream()));
+            String request = MessageType.gameOver + "&lose_type=" + data.get("lose_type");
+
+            out.write(request + "\n");
+            out.flush();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

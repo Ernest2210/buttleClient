@@ -4,7 +4,8 @@ public enum MessageType {
     waitSecondPlayer ("waitSecondPlayer"),
     startGame ("startGame"),
     makeMove ("makeMove"),
-    makeShot ("makeShoot");
+    makeShot ("makeShoot"),
+    gameOver ("gameOver");
 
     private final String type;
 

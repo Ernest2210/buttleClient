@@ -1,12 +1,17 @@
 package org.client.controller;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.image.Image;
+import javafx.stage.Stage;
+import org.client.Main;
 import org.client.Player;
 import org.client.connection.ServerConnection;
 import org.client.enums.FieldType;
@@ -14,6 +19,8 @@ import org.client.enums.MessageType;
 import org.client.enums.PlayerType;
 
 import java.awt.*;
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -186,6 +193,8 @@ public class GameSceneController {
                 ap.getChildren().add(rectangle);
             }
         }
+        ServerConnection.getServerConnection().clearCallbacks();
+        ServerConnection.getServerConnection().addCallback(MessageType.gameOver, this::gameOver);
     }
 
     public PlayerType getPlayerType() {
@@ -230,5 +239,28 @@ public class GameSceneController {
         enemy.shot(Double.parseDouble(data.get("x_coord")),
                 Double.parseDouble(data.get("y_coord")),
                 data.get("direction"));
+    }
+
+    public void gameOver(Map<String, String> data){
+        Stage stage = (Stage) ap.getScene().getWindow();
+        FXMLLoader loader = new FXMLLoader();
+        URL xmlUrl = getClass().getResource("/fxml/gameOver.fxml");
+        loader.setLocation(xmlUrl);
+        Parent root = null;
+        try {
+            root = loader.load();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        GameOverScreenController gameOverScreenController = loader.getController();
+        String text = "";
+        if(data.get("lose_type").equals(player.getPlayerType().toString())){
+            text = "Вы проиграли";
+        }else{
+            text = "Вы победили";
+        }
+        gameOverScreenController.setText(text);
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
     }
 }

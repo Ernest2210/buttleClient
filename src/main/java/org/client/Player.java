@@ -1,6 +1,8 @@
 package org.client;
 
 import javafx.animation.AnimationTimer;
+import javafx.application.Platform;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.ImagePattern;
@@ -22,10 +24,12 @@ public class Player extends Rectangle {
     private AnchorPane ap;
     private Player enemy;
     private PlayerType playerType;
+    private ProgressBar healthProgressBar;
 
     public Player(boolean isPlayer, PlayerType type, AnchorPane ap){
         super();
         this.ap = ap;
+        healthProgressBar = new ProgressBar();
         images = new HashMap<>();
         health = 100;
         this.playerType = type;
@@ -76,6 +80,23 @@ public class Player extends Rectangle {
                 }
             }.start();
         }
+        Platform.runLater(() -> {
+            healthProgressBar.setStyle("-fx-accent: #038603");
+            healthProgressBar.setProgress(1);
+            healthProgressBar.setMinWidth(100);
+            healthProgressBar.setMaxWidth(100);
+            if(this.playerType == PlayerType.gray){
+                healthProgressBar.setLayoutX(0);
+                healthProgressBar.setLayoutY(0);
+            }else{
+                healthProgressBar.setLayoutX(
+                        GameSceneController.BLOCK_SIZE * GameSceneController.FIELD_SIZE_X - 100);
+                healthProgressBar.setLayoutY(
+                        GameSceneController.BLOCK_SIZE * GameSceneController.FIELD_SIZE_Y - 25);
+            }
+            ap.getChildren().add(healthProgressBar);
+            healthProgressBar.toFront();
+        });
     }
 
     public void shot(double x, double y, String direction){
@@ -123,7 +144,18 @@ public class Player extends Rectangle {
     }
 
     public void damage(){
-        this.health -= damageLevel;
-        System.out.println("health of " + this.playerType + ": " + health);
+        if(this.health > 0){
+            this.health -= damageLevel;
+            healthProgressBar.setProgress((double) this.health / 100);
+            if (this.health <= 0){
+                Map<String, String> data = new HashMap<>();
+                data.put("lose_type", this.playerType.toString());
+                ServerConnection.getServerConnection().sendGameOver(data);
+            }
+        }
+    }
+
+    public PlayerType getPlayerType() {
+        return playerType;
     }
 }
