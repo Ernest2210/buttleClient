@@ -242,6 +242,7 @@ public class GameSceneController {
     }
 
     public void gameOver(Map<String, String> data){
+        player.stopMove();
         Stage stage = (Stage) ap.getScene().getWindow();
         FXMLLoader loader = new FXMLLoader();
         URL xmlUrl = getClass().getResource("/fxml/gameOver.fxml");

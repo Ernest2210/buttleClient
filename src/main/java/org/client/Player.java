@@ -13,11 +13,11 @@ import org.client.enums.FieldType;
 import org.client.enums.PlayerType;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Player extends Rectangle {
-    private static final int damageLevel = 10;
+    private static final int DAMAGE_LEVEL = 10;
+    private static final int RELOAD_TIME_MILLIS = 1000;
     private Map<String, Image> images;
     private int health;
     private String direction;
@@ -25,10 +25,13 @@ public class Player extends Rectangle {
     private Player enemy;
     private PlayerType playerType;
     private ProgressBar healthProgressBar;
+    private AnimationTimer moveAnimationTimer;
+    private long lastSootTime;
 
     public Player(boolean isPlayer, PlayerType type, AnchorPane ap){
         super();
         this.ap = ap;
+        lastSootTime = System.currentTimeMillis();
         healthProgressBar = new ProgressBar();
         images = new HashMap<>();
         health = 100;
@@ -59,7 +62,7 @@ public class Player extends Rectangle {
 
         if(isPlayer){
             System.out.println(type);
-            new AnimationTimer() {
+            moveAnimationTimer = new AnimationTimer() {
                 public void handle(long now) {
                     for(String key: Main.getInput()){
                         Map<String, String> data;
@@ -78,7 +81,8 @@ public class Player extends Rectangle {
                     }
                     Main.clearInput();
                 }
-            }.start();
+            };
+            moveAnimationTimer.start();
         }
         Platform.runLater(() -> {
             healthProgressBar.setStyle("-fx-accent: #038603");
@@ -100,8 +104,11 @@ public class Player extends Rectangle {
     }
 
     public void shot(double x, double y, String direction){
-        Bullet bullet = new Bullet(x ,y , direction, ap, enemy);
-        ap.getChildren().add(bullet);
+        if(lastSootTime + RELOAD_TIME_MILLIS < System.currentTimeMillis()){
+            Bullet bullet = new Bullet(x ,y , direction, ap, enemy);
+            ap.getChildren().add(bullet);
+            lastSootTime = System.currentTimeMillis();
+        }
     }
 
     public void moveOnCoords(double x, double y, String direction){
@@ -145,7 +152,7 @@ public class Player extends Rectangle {
 
     public void damage(){
         if(this.health > 0){
-            this.health -= damageLevel;
+            this.health -= DAMAGE_LEVEL;
             healthProgressBar.setProgress((double) this.health / 100);
             if (this.health <= 0){
                 Map<String, String> data = new HashMap<>();
@@ -157,5 +164,9 @@ public class Player extends Rectangle {
 
     public PlayerType getPlayerType() {
         return playerType;
+    }
+
+    public void stopMove(){
+        moveAnimationTimer.stop();
     }
 }
