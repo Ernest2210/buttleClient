@@ -107,7 +107,20 @@ public class ServerConnection extends Thread{
     public void sendMove(Map<String, String> data){
         try {
             BufferedWriter out = new BufferedWriter(new OutputStreamWriter(this.socket.getOutputStream()));
-            String request = "makeMove&x_coord=" + data.get("x_coord") +
+            String request = MessageType.makeMove + "&x_coord=" + data.get("x_coord") +
+                    ";y_coord=" + data.get("y_coord") + ";direction=" + data.get("direction");
+
+            out.write(request + "\n");
+            out.flush();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void sendShoot(Map<String, String> data){
+        try {
+            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(this.socket.getOutputStream()));
+            String request = MessageType.makeShot + "&x_coord=" + data.get("x_coord") +
                     ";y_coord=" + data.get("y_coord") + ";direction=" + data.get("direction");
 
             out.write(request + "\n");

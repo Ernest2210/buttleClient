@@ -2,6 +2,7 @@ package org.client;
 
 import javafx.animation.AnimationTimer;
 import javafx.scene.image.Image;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import org.client.connection.ServerConnection;
@@ -14,13 +15,20 @@ import java.util.List;
 import java.util.Map;
 
 public class Player extends Rectangle {
+    private static final int damageLevel = 10;
     private Map<String, Image> images;
     private int health;
     private String direction;
-    public Player(boolean isPlayer, PlayerType type){
+    private AnchorPane ap;
+    private Player enemy;
+    private PlayerType playerType;
+
+    public Player(boolean isPlayer, PlayerType type, AnchorPane ap){
         super();
+        this.ap = ap;
         images = new HashMap<>();
         health = 100;
+        this.playerType = type;
         if(type == PlayerType.yellow){
             this.setX(GameSceneController.BLOCK_SIZE * (GameSceneController.FIELD_SIZE_X-1));
             this.setY(GameSceneController.BLOCK_SIZE * (GameSceneController.FIELD_SIZE_Y-1));
@@ -55,12 +63,24 @@ public class Player extends Rectangle {
                             data = move(key);
                             ServerConnection serverConnection = ServerConnection.getServerConnection();
                             serverConnection.sendMove(data);
+                        } else if (key.equals("SPACE")) {
+                            shot(getX() , getY() , direction);
+                            Map<String, String> requestData = new HashMap<>();
+                            requestData.put("x_coord", String.valueOf(getX()));
+                            requestData.put("y_coord", String.valueOf(getY()));
+                            requestData.put("direction", direction);
+                            ServerConnection.getServerConnection().sendShoot(requestData);
                         }
                     }
                     Main.clearInput();
                 }
             }.start();
         }
+    }
+
+    public void shot(double x, double y, String direction){
+        Bullet bullet = new Bullet(x ,y , direction, ap, enemy);
+        ap.getChildren().add(bullet);
     }
 
     public void moveOnCoords(double x, double y, String direction){
@@ -96,5 +116,14 @@ public class Player extends Rectangle {
         coords.put("y_coord", String.valueOf(getY()));
         coords.put("direction", this.direction);
         return coords;
+    }
+
+    public void setEnemy(Player enemy){
+        this.enemy = enemy;
+    }
+
+    public void damage(){
+        this.health -= damageLevel;
+        System.out.println("health of " + this.playerType + ": " + health);
     }
 }

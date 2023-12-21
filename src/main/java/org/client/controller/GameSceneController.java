@@ -194,16 +194,19 @@ public class GameSceneController {
 
     public void setPlayerType(PlayerType playerType) {
         this.playerType = playerType;
-        player = new Player(true, playerType);
+        player = new Player(true, playerType, ap);
         if(playerType == PlayerType.yellow){
-            enemy = new Player(false, PlayerType.gray);
+            enemy = new Player(false, PlayerType.gray, ap);
         }else{
-            enemy = new Player(false, PlayerType.yellow);
+            enemy = new Player(false, PlayerType.yellow, ap);
         }
+        player.setEnemy(enemy);
+        enemy.setEnemy(player);
         ap.getChildren().add(player);
         ap.getChildren().add(enemy);
         ServerConnection serverConnection = ServerConnection.getServerConnection();
         serverConnection.addCallback(MessageType.makeMove, this::moveEnemy);
+        serverConnection.addCallback(MessageType.makeShot, this::enemyShot);
     }
 
     public static List<List<FieldType>> getMap(){
@@ -221,5 +224,11 @@ public class GameSceneController {
 
     public void moveEnemy(Map<String, String> data){
         enemy.moveOnCoords(Double.parseDouble(data.get("x_coord")), Double.parseDouble(data.get("y_coord")), data.get("direction"));
+    }
+
+    public void enemyShot(Map<String, String> data){
+        enemy.shot(Double.parseDouble(data.get("x_coord")),
+                Double.parseDouble(data.get("y_coord")),
+                data.get("direction"));
     }
 }
